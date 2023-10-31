@@ -1,31 +1,30 @@
 import { InputText } from 'primereact/inputtext';
-import { useState, useContext, useRef } from 'react';
+import { useState, useContext, useRef, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { CascadeSelect } from 'primereact/cascadeselect';
 import { InputNumber } from 'primereact/inputnumber';
 import Nav from '@/app/components/Nav';
+import Footer from '@/app/components/Footer';
 import { UserContext } from '@/utils/context/user';
 import { CityContext } from '@/utils/context/city';
 import cityData from '@/utils/service/citydata';
 
 import { Toast } from 'primereact/toast';
-import { FileUpload } from 'primereact/fileupload';
-import { ProgressBar } from 'primereact/progressbar';
+import { Image } from 'primereact/image';
 import { Button } from 'primereact/button';
-import { Tooltip } from 'primereact/tooltip';
-import { Tag } from 'primereact/tag';
+import UploadImg from '@/app/components/UploadImg';
+
+import axios from 'axios';
 
 import { z } from 'zod';
 
 export default function Post() {
-  const schema = z.object({
-    user: z.string().min(1, 'Need a valid user'),
-    city: z.string().min(1, 'Need a valid city'),
-  });
   const router = useRouter();
+
   const { user } = useContext(UserContext);
-  const { city } = useContext(CityContext);
-  const [roomData, setRoomData] = useState({ city: city.code });
+
+  const { city, getCityName } = useContext(CityContext);
+  const [roomData, setRoomData] = useState({ user: user, city: city.code });
 
   const [title, setTitle] = useState('');
   const [price, setPrice] = useState('');
@@ -37,11 +36,54 @@ export default function Post() {
   const [address, setAddress] = useState('');
   const [location, setLocation] = useState(null);
   const [selectedCity, setSelectedCity] = useState(city);
+  // For update original image array when it's a modify action
+  const [existingImages, setExistingImages] = useState([]);
 
+  const initializeRoom = parsedRoom => {
+    // This is a editing operation
+    setTitle(parsedRoom.title);
+    setPrice(parsedRoom.price);
+    setContact(parsedRoom.contact);
+    setNumber(parsedRoom.number);
+    setArea(parsedRoom.area);
+    setFloor(parsedRoom.floor);
+    setAddress(parsedRoom.address);
+    setLocation(parsedRoom.location);
+    setSelectedCity(getCityName(parsedRoom.city));
+
+    setRoomData(parsedRoom);
+
+    setExistingImages(parsedRoom.url);
+  };
+
+  const mode = router.query.mode;
+  useEffect(() => {
+    if (mode == 'edit') {
+      const room = localStorage.getItem('roomData');
+      localStorage.removeItem('roomData');
+      const parsedRoom = JSON.parse(room);
+      initializeRoom(parsedRoom);
+    }
+  }, []);
+
+  const fileUploadRef = useRef(null);
+
+  const toastMessage = useRef(null);
+
+  const showToast = (message, type) => {
+    toastMessage.current.show({
+      severity: type,
+      summary: type.charAt(0).toUpperCase() + type.slice(1),
+      detail: message,
+      life: 3000,
+    });
+  };
   // Get lat lng data from address input
   const setGeoPosition = async () => {
     if (address) {
-      const ADDRESS_STRING = encodeURIComponent(address);
+      const ADDRESS_STRING = encodeURIComponent(
+        address + ', ' + selectedCity + ', France',
+      );
       const apiGeoAddress = `https://maps.googleapis.com/maps/api/geocode/json?address=${ADDRESS_STRING}&key=${process.env.NEXT_PUBLIC_GOOGLE_MAP_KEY}`;
 
       try {
@@ -67,203 +109,116 @@ export default function Post() {
               lng: data.results[0].geometry.location.lng,
             },
           });
-
-          console.log(data.results[0].geometry.location);
-          alert('valid address');
+          showToast('Valid Address', 'success');
         } else {
-          alert('Can not get loaction data, invalid address.');
+          showToast('Can not get loaction data, invalid address.', 'error');
           return;
         }
       } catch (error) {
-        console.error('Error:', error);
+        showToast('Error', 'error');
         return;
       }
     }
   };
-  //--- Primereact Upload Component configuration start
-
-  const toast = useRef(null);
-  const [totalSize, setTotalSize] = useState(0);
-  const fileUploadRef = useRef(null);
-
-  const onTemplateSelect = e => {
-    let _totalSize = totalSize;
-    let files = e.files;
-
-    Object.keys(files).forEach(key => {
-      _totalSize += files[key].size || 0;
-    });
-
-    setTotalSize(_totalSize);
+  const onDeleteImg = (index, e) => {
+    e.preventDefault();
+    const updatedRoomImages = existingImages;
+    updatedRoomImages.splice(index, 1);
+    setRoomData({ ...roomData, url: updatedRoomImages });
   };
-
-  const onTemplateRemove = (file, callback) => {
-    setTotalSize(totalSize - file.size);
-    callback();
-  };
-
-  const onTemplateClear = () => {
-    setTotalSize(0);
-  };
-
-  const headerTemplate = options => {
-    const { className, chooseButton, cancelButton } = options;
-    const value = totalSize / 10000;
-    const formatedValue =
-      fileUploadRef && fileUploadRef.current
-        ? fileUploadRef.current.formatSize(totalSize)
-        : '0 B';
-
-    return (
-      <div
-        className={className}
-        style={{
-          backgroundColor: 'transparent',
-          display: 'flex',
-          alignItems: 'center',
-        }}
-      >
-        {chooseButton}
-
-        {cancelButton}
-        <div className="flex align-items-center gap-3 ml-auto">
-          <span>{formatedValue} / 1 MB</span>
-          <ProgressBar
-            value={value}
-            showValue={false}
-            style={{ width: '10rem', height: '12px' }}
-          ></ProgressBar>
-        </div>
-      </div>
-    );
-  };
-
-  const itemTemplate = (file, props) => {
-    return (
-      <div className="flex align-items-center flex-wrap">
-        <div className="flex align-items-center" style={{ width: '40%' }}>
-          <img
-            alt={file.name}
-            role="presentation"
-            src={file.objectURL}
-            width={100}
-          />
-          <span className="flex flex-column text-left ml-3">
-            {file.name}
-            <small>{new Date().toLocaleDateString()}</small>
-          </span>
-        </div>
-        <Tag
-          value={props.formatSize}
-          severity="warning"
-          className="px-3 py-2"
-        />
-        <Button
-          type="button"
-          icon="pi pi-times"
-          className="p-button-outlined p-button-rounded p-button-danger ml-auto"
-          onClick={() => onTemplateRemove(file, props.onRemove)}
-        />
-      </div>
-    );
-  };
-
-  const emptyTemplate = () => {
-    return (
-      <div className="flex align-items-center flex-column">
-        <i
-          className="pi pi-image mt-3 p-5"
-          style={{
-            fontSize: '5em',
-            borderRadius: '50%',
-            backgroundColor: 'var(--surface-b)',
-            color: 'var(--surface-d)',
-          }}
-        ></i>
-        <span
-          style={{ fontSize: '1.2em', color: 'var(--text-color-secondary)' }}
-          className="my-5"
-        >
-          Drag and Drop Image Here
-        </span>
-      </div>
-    );
-  };
-
-  const chooseOptions = {
-    icon: 'pi pi-fw pi-images',
-    iconOnly: true,
-    className: 'custom-choose-btn p-button-rounded p-button-outlined',
-  };
-
-  const cancelOptions = {
-    icon: 'pi pi-fw pi-times',
-    iconOnly: true,
-    className:
-      'custom-cancel-btn p-button-danger p-button-rounded p-button-outlined',
-  };
-  //--- Primereact Upload Component configuration end
-
   // Submit to add a new room
   const onSubmit = async e => {
     e.preventDefault();
     const formData = new FormData();
-
     // Set all images files' data to formData
     const fileList = fileUploadRef.current.getFiles();
     fileList.forEach(file => {
       formData.append('files', file);
     });
-
-    // Set username to formData
-    const updatedRoomData = {
-      ...roomData,
-      user: user,
-    };
-    setRoomData(updatedRoomData);
-
-    // Validation to roomData
-    const result = schema.safeParse(roomData);
-    if (!result.success) {
-      alert('Validation error.');
-
+    if (!location) {
+      showToast('Get room location failed', 'error');
       return;
     }
-
     formData.append('data', JSON.stringify(roomData));
-    console.log(roomData);
-    // Send add room request
-    const url = [process.env.NEXT_PUBLIC_API_URL, 'room', 'add'].join('/');
-    const res = await fetch(url, {
-      method: 'POST',
-      body: formData,
-    });
-    if (res.status === 200) {
-      alert('add a room');
-
-      router.push({
-        pathname: '/account',
+    // Send update room request
+    if (mode == 'edit') {
+      const id = roomData.id;
+      const url = [process.env.NEXT_PUBLIC_API_URL, 'room', 'edit', id].join(
+        '/',
+      );
+      const res = await axios({
+        method: 'put',
+        url: url,
+        data: formData,
       });
+      if (res.status === 200) {
+        showToast('Room updated', 'success');
+
+        setTimeout(() => {
+          router.push({
+            pathname: '/account',
+          });
+        }, 2000);
+      } else {
+        showToast('Update a room failed', 'error');
+        return;
+      }
+      // Send add room request
     } else {
-      alert(res.json());
+      const url = [process.env.NEXT_PUBLIC_API_URL, 'room', 'add'].join('/');
+      const res = await fetch(url, {
+        method: 'POST',
+        body: formData,
+      });
+      if (res.status === 200) {
+        showToast('Room added', 'success');
+        setTimeout(() => {
+          router.push({
+            pathname: '/account',
+          });
+        }, 2000);
+      } else {
+        showToast('Posting a room failed', 'error');
+        return;
+      }
     }
   };
   return (
-    <>
-      <div className="flex flex-column gap-2 p-4">
-        <Nav selectFlag={false} />
-        <form onSubmit={onSubmit}>
-          <label htmlFor="title">Title</label>
-          <InputText
-            id="title"
-            required
-            value={title}
-            onChange={e => {
-              setTitle(e.target.value);
-              setRoomData({ ...roomData, title: e.target.value });
-            }}
-          />
-          <p>{roomData.city}</p>
+    <div className="flex flex-column justify-content-center align-items-center h-screen w-screen relative">
+      <Nav selectFlag={false} />
+      <Toast ref={toastMessage} position="center" />
+
+      <form className="postContainer" onSubmit={onSubmit}>
+        <div className="flex align-self-center flex-column  m-4 item1 ">
+          <div className="flex flex-wrap w-full ">
+            {mode == 'edit' ? (
+              existingImages.length > 0 ? (
+                existingImages.map((img, index) => {
+                  return (
+                    <>
+                      <Image
+                        src={img}
+                        alt={title}
+                        width="200"
+                        key={index}
+                      ></Image>
+                      <Button
+                        icon="pi pi-times"
+                        className="p-button-rounded"
+                        onClick={e => onDeleteImg(index, e)}
+                      ></Button>
+                    </>
+                  );
+                })
+              ) : (
+                <span className="text-3xl">No image yet</span>
+              )
+            ) : null}
+          </div>
+          <UploadImg fileUploadRef={fileUploadRef} />
+        </div>
+
+        <div className="flex align-self-center flex-column align-items-start gap-2 m-4 item2">
           <label htmlFor="city">City</label>
           <CascadeSelect
             id="city"
@@ -281,94 +236,107 @@ export default function Post() {
             placeholder="Select a City"
             style={{ width: '10rem' }}
           />
-          <label htmlFor="price">Price</label>
-          <InputNumber
-            value={price}
-            onValueChange={e => {
-              setPrice(e.value);
-              setRoomData({ ...roomData, price: e.value });
-            }}
-            mode="currency"
-            currency="EUR"
-            locale="fr-FR"
-            min={0}
-            max={10000}
-          />
-          <label htmlFor="number">Number of rooms</label>
-
-          <InputNumber
+          <label htmlFor="title">Title</label>
+          <InputText
+            style={{ width: '100%' }}
+            id="title"
+            placeholder="Title"
             required
-            id="number"
-            value={number}
-            onValueChange={e => {
-              setNumber(e.value);
-              setRoomData({ ...roomData, number: e.value });
+            value={title}
+            onChange={e => {
+              setTitle(e.target.value);
+              setRoomData({ ...roomData, title: e.target.value });
             }}
-            min={0}
-            max={100}
           />
-          <label htmlFor="area">Area</label>
-
-          <InputNumber
-            required
-            id="area"
-            suffix=" m²"
-            value={area}
-            onValueChange={e => {
-              setArea(e.value);
-              setRoomData({ ...roomData, area: e.value });
-            }}
-            min={0}
-            max={10000}
-          />
-          <label htmlFor="floor">Floor</label>
-
-          <InputNumber
-            required
-            id="floor"
-            value={floor}
-            onValueChange={e => {
-              setFloor(e.value);
-              setRoomData({ ...roomData, floor: e.value });
-            }}
-            min={0}
-            max={10000}
-          />
-          <div>
-            <Toast ref={toast}></Toast>
-
-            <Tooltip
-              target=".custom-choose-btn"
-              content="Choose"
-              position="bottom"
-            />
-
-            <Tooltip
-              target=".custom-cancel-btn"
-              content="Clear"
-              position="bottom"
-            />
-
-            <FileUpload
-              ref={fileUploadRef}
-              name="files"
-              multiple
-              accept="image/*"
-              maxFileSize={1000000}
-              onSelect={onTemplateSelect}
-              onError={onTemplateClear}
-              onClear={onTemplateClear}
-              headerTemplate={headerTemplate}
-              itemTemplate={itemTemplate}
-              emptyTemplate={emptyTemplate}
-              chooseOptions={chooseOptions}
-              cancelOptions={cancelOptions}
+          <div className="flex flex-column gap-2">
+            <label htmlFor="price">Price</label>
+            <InputNumber
+              style={{ width: '10rem' }}
+              required
+              value={price}
+              placeholder="Price"
+              tooltipOptions={{ position: 'bottom' }}
+              tooltip="Please enter a positive integer"
+              onValueChange={e => {
+                setPrice(e.value);
+                setRoomData({ ...roomData, price: e.value });
+              }}
+              mode="currency"
+              currency="EUR"
+              locale="fr-FR"
+              min={0}
+              max={10000}
             />
           </div>
-          <label htmlFor="address">Address</label>
+          <div className=" flex flex-column gap-2">
+            <label htmlFor="number">Number of rooms</label>
+            <InputNumber
+              style={{ width: '10rem' }}
+              required
+              id="number"
+              placeholder="Number of rooms"
+              tooltipOptions={{ position: 'bottom' }}
+              tooltip="Please enter a positive integer"
+              value={number}
+              onValueChange={e => {
+                setNumber(e.value);
+                setRoomData({ ...roomData, number: e.value });
+              }}
+              min={0}
+              max={100}
+            />
+          </div>
+          <div className=" flex flex-column  gap-2">
+            <label htmlFor="area">Area</label>
+            <InputNumber
+              style={{ width: '10rem' }}
+              required
+              id="area"
+              suffix=" m²"
+              placeholder="Area"
+              tooltipOptions={{ position: 'bottom' }}
+              tooltip="Please enter a positive integer"
+              value={area}
+              onValueChange={e => {
+                setArea(e.value);
+                setRoomData({ ...roomData, area: e.value });
+              }}
+              min={0}
+              max={10000}
+            />
+          </div>
+          <div className=" flex flex-column gap-2">
+            <label htmlFor="floor">Floor</label>
+            <InputNumber
+              style={{ width: '10rem' }}
+              required
+              id="floor"
+              placeholder="Floor"
+              tooltipOptions={{ position: 'bottom' }}
+              tooltip="Please enter a positive integer"
+              value={floor}
+              onValueChange={e => {
+                setFloor(e.value);
+                setRoomData({ ...roomData, floor: e.value });
+              }}
+              min={0}
+              max={10000}
+            />
+          </div>
+
+          <label htmlFor="address">
+            Address{' '}
+            <span>
+              {location
+                ? `Latitude and longitude: ${location.lat}+${location.lng}`
+                : null}
+            </span>
+          </label>
           <InputText
+            style={{ width: '100%' }}
             required
             id="address"
+            placeholder="Address"
             value={address}
             onChange={e => {
               setAddress(e.target.value);
@@ -378,21 +346,24 @@ export default function Post() {
           />
           <label htmlFor="contact">Contact</label>
           <InputText
+            style={{ width: '100%' }}
             required
             id="contact"
+            placeholder="Contact information"
             value={contact}
             onChange={e => {
               setContact(e.target.value);
               setRoomData({ ...roomData, contact: e.target.value });
             }}
           />
-          <p>{location ? `${location.lat}+${location.lng} ` : 'location'}</p>
-          <p>{user ? user : 'user'}</p>
-          {/*<p>{selectedCity?.code}</p>
-          <p>{address}</p> */}
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-    </>
+
+          <Button className="w-6rem" type="submit">
+            Submit
+          </Button>
+        </div>
+      </form>
+
+      <Footer />
+    </div>
   );
 }

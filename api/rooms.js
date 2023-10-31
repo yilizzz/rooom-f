@@ -40,22 +40,82 @@ export const getCityRooms = async cityCode => {
   // This city has no room data or network errors
   return [];
 };
-// Add a rental room announce
-export const AddRoom = async (files, user) => {
-  const url = [API_URL, 'room', 'add'].join('/');
+// Get posted rooms of certain user
+export const getPostRooms = async user => {
+  const url = [API_URL, 'room', 'postlist', user].join('/');
+
+  const response = await axios.get(url);
+
+  if (response.status === 200) {
+    return response.data;
+  }
+  // This users has not posted room yet
+  return [];
+};
+// Get marked rooms of certain user
+export const getMarkedRooms = async user => {
+  const url = [API_URL, 'room', 'marklist', user].join('/');
+
+  const response = await axios.get(url);
+
+  if (response.status === 200) {
+    return response.data;
+  }
+  console.log(response.data.error);
+  return [];
+};
+export const deleteMark = async (user, id) => {
+  const url = [API_URL, 'room', 'deletemark'].join('/');
+
   const response = await axios({
-    method: 'POST',
+    method: 'DELETE',
     url: url,
     data: {
-      files,
       user,
+      id,
     },
   });
   if (response.status === 200) {
-    console.log('Add a room successful');
-    return 200;
+    console.log('One room unmarked.');
+    return true;
   }
+  console.log(response.data.error);
+  return false;
 };
+export const deletePost = async (user, id) => {
+  const url = [API_URL, 'room', 'deletepost'].join('/');
+
+  const response = await axios({
+    method: 'DELETE',
+    url: url,
+    data: {
+      user,
+      id,
+    },
+  });
+  if (response.status === 200) {
+    console.log('One room deleted.');
+    return true;
+  }
+  console.log(response.data.error);
+  return false;
+};
+// Add a rental room announce
+// export const AddRoom = async (files, user) => {
+//   const url = [API_URL, 'room', 'add'].join('/');
+//   const response = await axios({
+//     method: 'POST',
+//     url: url,
+//     data: {
+//       files,
+//       user,
+//     },
+//   });
+//   if (response.status === 200) {
+//     console.log('Add a room successful');
+//     return 200;
+//   }
+// };
 // Mark a room for a certain user
 export const markRoom = async (user, id) => {
   const url = [API_URL, 'room', 'mark'].join('/');
@@ -68,14 +128,6 @@ export const markRoom = async (user, id) => {
       id,
     },
   });
-
-  // const response = await fetch('http://localhost:3001/mark', {
-  //   method: 'POST',
-  //   body: JSON.stringify({ user, id }),
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  // });
   if (response.status === 200) {
     console.log('Mark a room successful');
     return 200;

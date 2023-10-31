@@ -1,4 +1,6 @@
 :root {
+  /* --primary-color: #345c9d; */
+  --cat-color: #e2c17c;
 }
 
 * {
@@ -11,10 +13,66 @@ html,
 body {
   width: 100vw;
   height: 100vh;
-  background-color: cadetblue;
+  /* background-color: var(--primary-color); */
   overflow-x: hidden;
   /* Each PrimeReact theme has its own font family so it is suggested to apply it */
   font-family: var(--font-family);
   display: flex;
   flex-direction: column;
+}
+img {
+  object-fit: cover;
+}
+a {
+  color: var(--highlight-text-color);
+}
+a:visited {
+  color: var(--highlight-text-color);
+}
+.navItem {
+  font-size: 1.75rem;
+  padding: 3rem;
+}
+
+.postContainer {
+  display: flex;
+  flex-direction: row;
+  align-self: center;
+  justify-content: center;
+  align-items: flex-start;
+  height: 80vw;
+  width: 100vw;
+  padding-top: 10rem;
+  overflow: scroll;
+}
+.item1,
+.item2 {
+  min-width: 600px;
+  min-height: 800px;
+}
+/* Media query for screens with a maximum width of 1199px */
+@media (max-width: 1199px) {
+  .navItem {
+    font-size: 1.25rem;
+    padding: 1rem;
+  }
+  .postContainer {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 13rem;
+  }
+
+  .item1,
+  .item2 {
+    width: 80vw;
+    margin: 1rem;
+  }
+  .item1 {
+    min-height: 600px;
+    justify-content: end;
+  }
+  .item2 {
+    min-height: 800px;
+  }
 }

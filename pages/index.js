@@ -1,9 +1,8 @@
-import Link from 'next/link';
-import { getAllRooms, getLatest } from '@/api/rooms';
-import React, { useState, useContext } from 'react';
-import { CascadeSelect } from 'primereact/cascadeselect';
-import { CityContext } from '@/utils/context/city';
+import { getLatest } from '@/api/rooms';
+import React from 'react';
 import Nav from '@/app/components/Nav';
+import Circular from '@/app/components/Circular';
+import Footer from '@/app/components/Footer';
 
 export async function getServerSideProps() {
   try {
@@ -26,20 +25,10 @@ export async function getServerSideProps() {
 function Page({ rooms }) {
   return (
     <>
-      <div>
+      <div className="flex flex-column justify-content-center align-items-center h-screen w-screen relative">
         <Nav selectFlag={true}></Nav>
-
-        <h2>Rooms</h2>
-        <ul>
-          {rooms &&
-            rooms.map((room, index) => (
-              <li key={index}>
-                {room.url[0] ? (
-                  <img src={room.url[0]} alt={room.title} />
-                ) : null}
-              </li>
-            ))}
-        </ul>
+        <Circular rooms={rooms} />
+        <Footer />
       </div>
     </>
   );

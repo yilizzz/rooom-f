@@ -4,13 +4,30 @@
 'use client';
 
 import { createContext, useState } from 'react';
+import cityData from '../service/citydata';
 
 export const CityContext = createContext({});
 
 export default function CityProvider({ children }) {
   const [city, setCity] = useState({ cname: 'Troyes', code: '10000' });
+  const getCityName = cityCode => {
+    const selectedRegion = cityData.find(region =>
+      region.departement.some(dept =>
+        dept.cities.some(city => city.code === cityCode),
+      ),
+    );
+    if (selectedRegion) {
+      const city = selectedRegion.departement
+        .flatMap(dept => dept.cities)
+        .find(city => city.code === cityCode);
+      if (city) {
+        return city.cname;
+      }
+    }
+    return null;
+  };
   return (
-    <CityContext.Provider value={{ city, setCity }}>
+    <CityContext.Provider value={{ city, setCity, getCityName }}>
       {children}
     </CityContext.Provider>
   );

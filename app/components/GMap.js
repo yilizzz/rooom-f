@@ -4,7 +4,7 @@ import {
   useLoadScript,
   InfoWindow,
 } from '@react-google-maps/api';
-import styles from './GMap.module.css';
+// import styles from './GMap.module.css';
 import React, { useContext, useState } from 'react';
 import { UserContext } from '@/utils/context/user';
 import { Button } from 'primereact/button';
@@ -47,14 +47,14 @@ const GMap = ({ cityRooms }) => {
   const router = useRouter();
 
   const onDetails = room => {
-    console.log(room);
+    localStorage.setItem('detailData', JSON.stringify(room));
     router.push({
-      pathname: '/details', // 目标页面的路径
-      query: { room: JSON.stringify(room) },
+      pathname: '/details',
+      query: { mode: 'fromMapPage' },
     });
   };
   return (
-    <div className={styles.container}>
+    <div style={{ width: '80vw', height: '70vh', margin: '2rem auto' }}>
       {isLoaded ? (
         <GoogleMap
           mapContainerStyle={containerStyle}
@@ -74,34 +74,44 @@ const GMap = ({ cityRooms }) => {
                   position={room.location}
                   onCloseClick={() => setActiveMarker(null)}
                 >
-                  <div>
-                    {room.title}
-                    <Button severity="info" onClick={() => onDetails(room)}>
-                      Details
-                    </Button>
-                    <div>
+                  <div className="flex flex-column justify-content-center align-item-center m-2 gap-3">
+                    <div className="text-xl flex align-self-center">
+                      {room.title}
+                    </div>
+                    <div className="flex align-self-center">
                       <Image
                         src={room.url[0]}
                         zoomSrc={room.url[0]}
                         alt="Image"
-                        width="80"
-                        height="60"
+                        width="320"
+                        height="240"
                         preview
                       />
                     </div>
-                    {user ? (
-                      <Button
-                        severity="info"
-                        onClick={() => onMarkRoom(user, room.id)}
-                      >
-                        Mark
-                      </Button>
-                    ) : (
-                      // <Button severity="info" onClick={onLogin}>
-                      //   Login to mark
-                      // </Button>
-                      <Link href="/account">Login to mark</Link>
-                    )}
+                    <Button
+                      className="align-self-center"
+                      severity="info"
+                      onClick={() => onDetails(room)}
+                    >
+                      Details
+                    </Button>
+                    <div className="text-xl flex align-self-center">
+                      {user ? (
+                        <Button
+                          severity="info"
+                          onClick={() => onMarkRoom(user, room.id)}
+                        >
+                          Mark
+                        </Button>
+                      ) : (
+                        // <Button severity="info" onClick={onLogin}>
+                        //   Login to mark
+                        // </Button>
+                        <Link className="no-underline" href="/account">
+                          Login to mark
+                        </Link>
+                      )}
+                    </div>
                   </div>
                 </InfoWindow>
               ) : null}

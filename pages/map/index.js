@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useState } from 'react';
 import { CityContext } from '@/utils/context/city';
 import styles from '@/styles/map.css';
 import Nav from '@/app/components/Nav';
+import Footer from '@/app/components/Footer';
 import GMap from '@/app/components/GMap';
 import { getCityRooms } from '@/api/rooms';
 
@@ -14,8 +15,6 @@ export default function Map() {
       const res = await getCityRooms(city.code);
       if (res) {
         setCityRooms(res);
-        console.log('Map page');
-        console.log(res);
       }
     };
 
@@ -23,15 +22,18 @@ export default function Map() {
   }, [city.code]);
 
   return (
-    <div className={styles.container}>
+    <div className="flex flex-column justify-content-center align-items-center h-screen w-screen relative">
       <Nav selectFlag={true} />
+
       {cityRooms.length > 0 ? (
         <div>
           <GMap cityRooms={cityRooms} />
         </div>
       ) : (
-        <div>No data</div>
+        <div className="align-self-center">No Data Yet</div>
       )}
+
+      <Footer />
     </div>
   );
 }

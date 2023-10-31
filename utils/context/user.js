@@ -22,9 +22,18 @@ export default function UserProvider({ children }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
     // Logic to clear user information on logout
-    setUser(null);
+    const response = await fetch('http://localhost:3001/logout', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.status === 200) {
+      setUser(null);
+    }
   };
 
   return (
