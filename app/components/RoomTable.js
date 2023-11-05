@@ -39,16 +39,20 @@ export default function PostTable({ data, isMark, refreshPage }) {
   };
   const onDeleteRoom = id => {
     if (isMark) {
-      if (deleteMark(user, id)) {
+      const deleted = deleteMark(user, id);
+      if (deleted) {
         refreshPage();
+      } else {
+        showToast('Unmark a room failed', 'error');
       }
-      showToast('Unmark a room failed', 'error');
+    } else {
+      const deleted = deletePost(user, id);
+      if (deleted) {
+        refreshPage();
+      } else {
+        showToast('Delete a post failed', 'error');
+      }
     }
-
-    if (deletePost(user, id)) {
-      refreshPage();
-    }
-    showToast('Delete a post failed', 'error');
   };
   const itemTemplate = room => {
     return (

@@ -2,12 +2,13 @@ export default function Footer() {
   return (
     <>
       <footer
-        style={{ backgroundColor: 'var(--cat-color)' }}
-        className="flex flex-column align-items-center justify-content-conter w-full h-5rem fixed left-0 bottom-0"
+        style={{ backgroundColor: 'var(--primary-color)' }}
+        className="flex flex-column align-items-center justify-content-center w-full h-3rem fixed left-0 bottom-0"
       >
-        <h3 className="zoominleft animation-duration-5000 align-items-center justify-content-center">
-          🐾 WHEN A CAT THINKS ITS IDEAL ROOOM IS A CARTON...
-        </h3>
+        <p className="flex justify-content-center text-l text-blue-900 w-13rem">
+          "I like the carton the most."
+        </p>
+        <p className="flex justify-content-end text-blue-900 w-11rem">🐾</p>
       </footer>
     </>
   );

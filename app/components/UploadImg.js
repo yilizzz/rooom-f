@@ -131,7 +131,7 @@ export default function ({ fileUploadRef }) {
   };
   //--- Primereact Upload Component configuration end
   return (
-    <div>
+    <div className="border-round border-blue-900">
       <Toast ref={toast}></Toast>
 
       <Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />

@@ -1,6 +1,5 @@
 import React, { useEffect, useContext, useState } from 'react';
 import { CityContext } from '@/utils/context/city';
-import styles from '@/styles/map.css';
 import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/Footer';
 import GMap from '@/app/components/GMap';

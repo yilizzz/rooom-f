@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import React, { useState, useContext } from 'react';
 import { CascadeSelect } from 'primereact/cascadeselect';
+import Image from 'next/image';
 import { CityContext } from '@/utils/context/city';
 
 import cityData from '@/utils/service/citydata';
@@ -13,25 +14,31 @@ const Nav = ({ selectFlag }) => {
   return (
     <>
       <nav
-        style={{ backgroundColor: 'var(--cat-color)' }}
-        className="flex flex-row align-items-center justify-content-end h-5rem w-full absolute left-0 top-0 z-5"
+        style={{ backgroundColor: 'var(--primary-color)' }}
+        className="flex flex-row align-items-center justify-content-end h-4rem w-full absolute left-0 top-0 z-5"
       >
         <Link
-          className="no-underline font-semibold align-items-center justify-content-center navItem"
+          className="navItem absolute left-0 text-orange-700"
           href="/"
           cursor-pointer="true"
         >
-          HOME
+          MY ROOOM
+          <Image
+            src="/favicon.png"
+            alt="My Rooom"
+            width="40"
+            height="40"
+          ></Image>
         </Link>
         <Link
-          className="no-underline font-semibold align-items-center justify-content-center navItem"
+          className="navItem text-orange-700"
           href="/map"
           cursor-pointer="true"
         >
           MAP
         </Link>
         <Link
-          className="no-underline font-semibold align-items-center justify-content-center navItem"
+          className="navItem text-orange-700"
           href="/account"
           cursor-pointer="true"
         >
@@ -41,7 +48,7 @@ const Nav = ({ selectFlag }) => {
         {selectFlag ? (
           <div>
             <CascadeSelect
-              className="text-xl font-medium align-items-center"
+              className="align-items-center bg-primary text-xl font-bold "
               value={city}
               onChange={e => {
                 setSelectedCity(e.value);

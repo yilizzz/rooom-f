@@ -6,11 +6,10 @@ import Footer from '@/app/components/Footer';
 
 export async function getServerSideProps() {
   try {
-    // const data = await getAllRooms();
     const data = await getLatest();
     return {
       props: {
-        rooms: data, // Ensure it's JSON data here
+        rooms: data,
       },
     };
   } catch (error) {

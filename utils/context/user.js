@@ -1,46 +1,32 @@
 'use client';
-
-import { createContext, useContext, useState } from 'react';
+import { logIn, logOut } from '@/api/user';
+import { createContext, useState } from 'react';
 
 export const UserContext = createContext();
 
 export default function UserProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [newUser, setNewUser] = useState(false);
 
-  // UseEffect????????????????????????????????????????????????????????
-  const login = async userData => {
-    const response = await fetch('http://localhost:3001/login', {
-      method: 'POST',
-      body: JSON.stringify(userData),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (response.status === 200) {
+  const login = userData => {
+    const res = logIn(userData);
+    if (res) {
+      if (res === 201) {
+        setNewUser(true);
+      }
       setUser(userData.username);
     }
   };
 
-  const logout = async () => {
-    // Logic to clear user information on logout
-    const response = await fetch('http://localhost:3001/logout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (response.status === 200) {
+  const logout = () => {
+    if (logOut()) {
       setUser(null);
     }
   };
 
   return (
-    <UserContext.Provider value={{ user, login, logout }}>
+    <UserContext.Provider value={{ user, newUser, login, logout }}>
       {children}
     </UserContext.Provider>
   );
 }
-
-// export default function useUser = () => useContext(UserContext);

@@ -16,8 +16,6 @@ import UploadImg from '@/app/components/UploadImg';
 
 import axios from 'axios';
 
-import { z } from 'zod';
-
 export default function Post() {
   const router = useRouter();
 
@@ -75,7 +73,7 @@ export default function Post() {
       severity: type,
       summary: type.charAt(0).toUpperCase() + type.slice(1),
       detail: message,
-      life: 3000,
+      life: 2000,
     });
   };
   // Get lat lng data from address input
@@ -139,48 +137,37 @@ export default function Post() {
       showToast('Get room location failed', 'error');
       return;
     }
+
     formData.append('data', JSON.stringify(roomData));
+    let res;
     // Send update room request
     if (mode == 'edit') {
-      const id = roomData.id;
-      const url = [process.env.NEXT_PUBLIC_API_URL, 'room', 'edit', id].join(
-        '/',
-      );
-      const res = await axios({
-        method: 'put',
+      // const id = roomData.id;
+      const url = [process.env.NEXT_PUBLIC_API_URL, 'room', 'edit'].join('/');
+      res = await axios({
+        method: 'PUT',
         url: url,
         data: formData,
       });
-      if (res.status === 200) {
-        showToast('Room updated', 'success');
-
-        setTimeout(() => {
-          router.push({
-            pathname: '/account',
-          });
-        }, 2000);
-      } else {
-        showToast('Update a room failed', 'error');
-        return;
-      }
       // Send add room request
     } else {
       const url = [process.env.NEXT_PUBLIC_API_URL, 'room', 'add'].join('/');
-      const res = await fetch(url, {
+      res = await axios({
         method: 'POST',
-        body: formData,
+        url: url,
+        data: formData,
       });
-      if (res.status === 200) {
-        showToast('Room added', 'success');
-        setTimeout(() => {
-          router.push({
-            pathname: '/account',
-          });
-        }, 2000);
-      } else {
-        showToast('Posting a room failed', 'error');
-        return;
-      }
+    }
+    if (res.status === 200) {
+      showToast('Data updated', 'success');
+      setTimeout(() => {
+        router.push({
+          pathname: '/account',
+        });
+      }, 2000);
+    } else {
+      showToast('Data update failed', 'error');
+      return;
     }
   };
   return (
@@ -189,17 +176,21 @@ export default function Post() {
       <Toast ref={toastMessage} position="center" />
 
       <form className="postContainer" onSubmit={onSubmit}>
-        <div className="flex align-self-center flex-column  m-4 item1 ">
-          <div className="flex flex-wrap w-full ">
+        <div className="flex align-self-center flex-column item1 ">
+          <UploadImg fileUploadRef={fileUploadRef} />
+          <div className="flex flex-wrap mt-4 relative">
             {mode == 'edit' ? (
               existingImages.length > 0 ? (
                 existingImages.map((img, index) => {
                   return (
-                    <>
+                    <div
+                      key={index}
+                      className="flex flex-nowrap items-center space-x-2 "
+                    >
                       <Image
                         src={img}
                         alt={title}
-                        width="200"
+                        width="160"
                         key={index}
                       ></Image>
                       <Button
@@ -207,7 +198,7 @@ export default function Post() {
                         className="p-button-rounded"
                         onClick={e => onDeleteImg(index, e)}
                       ></Button>
-                    </>
+                    </div>
                   );
                 })
               ) : (
@@ -215,10 +206,9 @@ export default function Post() {
               )
             ) : null}
           </div>
-          <UploadImg fileUploadRef={fileUploadRef} />
         </div>
 
-        <div className="flex align-self-center flex-column align-items-start gap-2 m-4 item2">
+        <div className="flex align-self-center flex-column gap-2 item2">
           <label htmlFor="city">City</label>
           <CascadeSelect
             id="city"

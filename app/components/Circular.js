@@ -1,10 +1,12 @@
 import React, { useContext } from 'react';
+import { useRouter } from 'next/router';
 import { CityContext } from '@/utils/context/city';
 import { Button } from 'primereact/button';
 import { Carousel } from 'primereact/carousel';
 
 export default function Circular({ rooms }) {
   const { getCityName } = useContext(CityContext);
+  const router = useRouter();
   const responsiveOptions = [
     {
       breakpoint: '1199px',
@@ -22,7 +24,13 @@ export default function Circular({ rooms }) {
       numScroll: 1,
     },
   ];
-
+  const onDetails = room => {
+    localStorage.setItem('detailData', JSON.stringify(room));
+    router.push({
+      pathname: '/details',
+      query: { mode: 'fromMapPage' },
+    });
+  };
   const productTemplate = room => {
     return (
       <div className=" m-1 text-center py-1 px-1">
@@ -45,14 +53,15 @@ export default function Circular({ rooms }) {
           <div className="my-3">
             <Button
               icon="pi pi-search"
-              className="p-button-success p-button-rounded"
+              className="p-button-success p-button-rounded bg-primary"
+              onClick={() => onDetails(room)}
             />
           </div>
-          <div className="flex flex-column justify-content-evenly align-item-center my-3">
-            <h3 className="flex align-self-center flex-wrap mb-1">
+          <div className="flex flex-column justify-content-evenly align-item-center my-3 ">
+            <h3 className="flex align-self-center flex-wrap mb-1 text-blue-900">
               {room.title}
             </h3>
-            <h4 className="flex align-self-center flex-wrap mt-0 mb-3">{`${
+            <h4 className="flex align-self-center flex-wrap mt-0 mb-3 text-primary">{`${
               room.address
             }, ${getCityName(room.city)}`}</h4>
           </div>
@@ -64,7 +73,7 @@ export default function Circular({ rooms }) {
   return (
     <div
       style={{ minHeight: '60vh', overflow: 'auto' }}
-      className="card w-11 bg-gray-400 p-8  "
+      className="card w-11 bg-gray-300 p-8  "
     >
       <Carousel
         value={rooms}

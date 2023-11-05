@@ -11,7 +11,7 @@ import RoomTable from '@/app/components/RoomTable';
 import { getPostRooms, getMarkedRooms } from '@/api/rooms';
 
 function Account() {
-  const { user, login, logout } = useContext(UserContext);
+  const { user, newUser, login, logout } = useContext(UserContext);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [postRooms, setPostRooms] = useState([]);
@@ -26,7 +26,7 @@ function Account() {
         severity: type,
         summary: type.charAt(0).toUpperCase() + type.slice(1),
         detail: message,
-        life: 3000,
+        life: 2000,
       });
     }
   };
@@ -55,14 +55,22 @@ function Account() {
   useEffect(() => {
     async function fetchData() {
       if (user) {
-        const resPost = await getPostRooms(user);
-        setPostRooms(resPost);
         const resMark = await getMarkedRooms(user);
         setMarkedRooms(resMark);
+        const resPost = await getPostRooms(user);
+        setPostRooms(resPost);
       }
     }
     fetchData();
   }, [user, refreshPage]);
+
+  useEffect(() => {
+    if (newUser) {
+      setTimeout(() => {
+        fetchData();
+      }, 500);
+    }
+  }, [newUser]);
 
   return (
     <div className="flex flex-column justify-content-center align-items-center h-screen w-screen relative">
@@ -71,7 +79,7 @@ function Account() {
       {user ? (
         <div className="flex flex-column align-self-center justify-content-start my-8 py-4 ml-8 overflow-auto">
           <div className="my-4 flex justify-content-between">
-            <h1>Hello, {user}!</h1>
+            <h1 className="text-orange-700">Hello, {user}!</h1>
 
             <div className="card flex justify-content-center">
               <Button
@@ -90,7 +98,7 @@ function Account() {
           </div>
 
           <div className="h-auto">
-            <h2>My rooms marked</h2>
+            <h2 className="text-blue-900">My rooms marked</h2>
             <RoomTable
               data={markedRooms}
               isMark={true}
@@ -99,7 +107,7 @@ function Account() {
           </div>
 
           <div className="h-auto">
-            <h2>My rooms posted</h2>
+            <h2 className="text-blue-900">My rooms posted</h2>
             <RoomTable
               data={postRooms}
               isMark={false}
@@ -110,19 +118,19 @@ function Account() {
       ) : (
         <div className=" flex flex-column align-self-center justify-content-evenly h-20rem w-30rem">
           {/* <div className=""> */}
-          <h2>LOG IN</h2>
+          <h2 className="text-blue-900">LOG IN</h2>
           <InputText
-            placeholder="Username"
+            placeholder="a"
             value={username}
             onChange={e => setUsername(e.target.value)}
           />
           <InputText
-            type="password"
-            placeholder="Password"
+            placeholder="a"
             value={password}
             onChange={e => setPassword(e.target.value)}
           />
           <Button
+            className="w-8rem flex align-self-end bg-blue-900"
             label="Login"
             icon="pi pi-external-link"
             onClick={() => handleLogin()}

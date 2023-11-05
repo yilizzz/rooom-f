@@ -10,12 +10,16 @@ import '@/styles/globals.css';
 
 import CityProvider from '@/utils/context/city';
 import UserProvider from '@/utils/context/user';
+import Head from 'next/head';
 
 export default function App({ Component, pageProps }) {
   return (
     <PrimeReactProvider>
       <UserProvider>
         <CityProvider>
+          <Head>
+            <link rel="icon" href="/favicon.png" />
+          </Head>
           <Component {...pageProps} />
         </CityProvider>
       </UserProvider>
