@@ -8,13 +8,11 @@ import Footer from '@/app/components/Footer';
 import { UserContext } from '@/utils/context/user';
 import { CityContext } from '@/utils/context/city';
 import cityData from '@/utils/service/citydata';
-
+import { updateRoom } from '@/api/rooms';
 import { Toast } from 'primereact/toast';
 import { Image } from 'primereact/image';
 import { Button } from 'primereact/button';
 import UploadImg from '@/app/components/UploadImg';
-
-import axios from 'axios';
 
 export default function Post() {
   const router = useRouter();
@@ -141,22 +139,12 @@ export default function Post() {
     formData.append('data', JSON.stringify(roomData));
     let res;
     // Send update room request
-    if (mode == 'edit') {
-      // const id = roomData.id;
-      const url = [process.env.NEXT_PUBLIC_API_URL, 'room', 'edit'].join('/');
-      res = await axios({
-        method: 'PUT',
-        url: url,
-        data: formData,
-      });
-      // Send add room request
-    } else {
-      const url = [process.env.NEXT_PUBLIC_API_URL, 'room', 'add'].join('/');
-      res = await axios({
-        method: 'POST',
-        url: url,
-        data: formData,
-      });
+    if (mode === 'edit') {
+      res = await updateRoom(formData, 'edit');
+    }
+    // Send add room request
+    if (mode === 'add') {
+      res = await updateRoom(formData, 'add');
     }
     if (res.status === 200) {
       showToast('Data updated', 'success');

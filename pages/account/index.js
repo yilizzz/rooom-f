@@ -31,15 +31,15 @@ function Account() {
     }
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (username != '' && password != '') {
-      login({ username, password });
+      await login({ username: username, password: password });
     } else {
       showToast('Need a username.', 'error');
     }
   };
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
   };
 
   const router = useRouter();
@@ -51,26 +51,27 @@ function Account() {
   };
   // useEffect must not return anything besides a function, which is used for clean-up.
   // Instead of using useEffect(async () => ...) or returned a Promise,
-  // write the async function inside the effect and call it immediately:
-  useEffect(() => {
-    async function fetchData() {
-      if (user) {
-        const resMark = await getMarkedRooms(user);
-        setMarkedRooms(resMark);
-        const resPost = await getPostRooms(user);
-        setPostRooms(resPost);
-      }
+  // write the async function inside/outside of the effect and call it
+  async function fetchData(user) {
+    if (user) {
+      const resMark = await getMarkedRooms(user);
+      setMarkedRooms(resMark);
+      console.log('data fetched:', resMark);
+      const resPost = await getPostRooms(user);
+      setPostRooms(resPost);
     }
-    fetchData();
-  }, [user, refreshPage]);
+  }
+  useEffect(() => {
+    fetchData(user);
+  }, [user]);
 
   useEffect(() => {
-    if (newUser) {
-      setTimeout(() => {
-        fetchData();
-      }, 500);
+    if (refreshPage) {
+      fetchData(user);
+      console.log('change');
+      setRefreshPage(false);
     }
-  }, [newUser]);
+  }, [refreshPage]);
 
   return (
     <div className="flex flex-column justify-content-center align-items-center h-screen w-screen relative">
@@ -136,8 +137,6 @@ function Account() {
             onClick={() => handleLogin()}
           />
         </div>
-
-        // </div>
       )}
       <Footer />
     </div>

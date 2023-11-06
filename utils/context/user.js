@@ -8,18 +8,22 @@ export default function UserProvider({ children }) {
   const [user, setUser] = useState(null);
   const [newUser, setNewUser] = useState(false);
 
-  const login = userData => {
-    const res = logIn(userData);
+  const login = async userData => {
+    const { username } = userData;
+    console.log('context', username);
+    const res = await logIn(userData);
+
     if (res) {
       if (res === 201) {
         setNewUser(true);
       }
-      setUser(userData.username);
+      setUser(username);
     }
   };
 
-  const logout = () => {
-    if (logOut()) {
+  const logout = async () => {
+    const res = await logOut();
+    if (res) {
       setUser(null);
     }
   };

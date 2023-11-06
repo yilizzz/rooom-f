@@ -37,21 +37,23 @@ export default function PostTable({ data, isMark, refreshPage }) {
       query: { mode: 'fromMarkPage' },
     });
   };
-  const onDeleteRoom = id => {
+  const onDeleteRoom = async id => {
+    let deleted = false;
+
     if (isMark) {
-      const deleted = deleteMark(user, id);
-      if (deleted) {
-        refreshPage();
-      } else {
-        showToast('Unmark a room failed', 'error');
-      }
+      deleted = await deleteMark(user, id);
     } else {
-      const deleted = deletePost(user, id);
-      if (deleted) {
-        refreshPage();
-      } else {
-        showToast('Delete a post failed', 'error');
-      }
+      deleted = await deletePost(user, id);
+    }
+
+    if (deleted) {
+      console.log('Deleted in table');
+      refreshPage();
+    } else {
+      showToast(
+        isMark ? 'Unmark a room failed' : 'Delete a post failed',
+        'error',
+      );
     }
   };
   const itemTemplate = room => {

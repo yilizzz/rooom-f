@@ -2,8 +2,8 @@ import 'primereact/resources/themes/lara-light-indigo/theme.css';
 
 import { PrimeReactProvider } from 'primereact/api';
 import '@/primereact-theme/theme.css';
-import 'primereact/resources/themes/lara-light-indigo/theme.css'; // theme
-import 'primeflex/primeflex.css'; // css utility
+import 'primereact/resources/themes/lara-light-indigo/theme.css';
+import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/primereact.css';
 import '@/styles/globals.css';
@@ -19,6 +19,7 @@ export default function App({ Component, pageProps }) {
         <CityProvider>
           <Head>
             <link rel="icon" href="/favicon.png" />
+            <title>My Rooom</title>
           </Head>
           <Component {...pageProps} />
         </CityProvider>

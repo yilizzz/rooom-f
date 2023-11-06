@@ -47,6 +47,7 @@ export const getPostRooms = async user => {
   if (response.status === 200) {
     return response.data;
   }
+  // This user has not posted room or network errors
   return [];
 };
 // Get marked rooms of certain user
@@ -61,6 +62,7 @@ export const getMarkedRooms = async user => {
   }
   return [];
 };
+// Private function: Delete a record from mark-list or post-list
 const deleteRoom = async (user, id, type) => {
   const url = [API_URL, 'room', type].join('/');
 
@@ -68,8 +70,8 @@ const deleteRoom = async (user, id, type) => {
     method: 'DELETE',
     url: url,
     data: {
-      user,
-      id,
+      user: user,
+      id: id,
     },
   });
   if (response.status === 200) {
@@ -77,12 +79,15 @@ const deleteRoom = async (user, id, type) => {
   }
   return false;
 };
-export const deleteMark = (user, id) => {
-  const deleted = deleteRoom(user, id, 'deletemark');
+// Delete a record from mark-list
+export const deleteMark = async (user, id) => {
+  const deleted = await deleteRoom(user, id, 'deletemark');
+
   return deleted;
 };
-export const deletePost = (user, id) => {
-  const deleted = deleteRoom(user, id, 'deletepost');
+// Delete a record from post-list
+export const deletePost = async (user, id) => {
+  const deleted = await deleteRoom(user, id, 'deletepost');
   return deleted;
 };
 
@@ -94,8 +99,8 @@ export const markRoom = async (user, id) => {
     method: 'POST',
     url: url,
     data: {
-      user,
-      id,
+      user: user,
+      id: id,
     },
   });
   if (response.status === 200) {
@@ -109,4 +114,16 @@ export const markRoom = async (user, id) => {
   // No such user or network errors
   console.log(response.data);
   return false;
+};
+export const updateRoom = async (formData, type) => {
+  if (type === 'edit') {
+    const url = [process.env.NEXT_PUBLIC_API_URL, 'room', 'edit'].join('/');
+    const res = await axios.put(url, formData);
+    return res;
+  }
+  if (type === 'add') {
+    const url = [process.env.NEXT_PUBLIC_API_URL, 'room', 'add'].join('/');
+    const res = await axios.post(url, formData);
+    return res;
+  }
 };
