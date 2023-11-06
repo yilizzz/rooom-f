@@ -151,6 +151,7 @@ export default function Post() {
       setTimeout(() => {
         router.push({
           pathname: '/account',
+          query: { mode: 'update' },
         });
       }, 2000);
     } else {

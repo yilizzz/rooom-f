@@ -10,24 +10,22 @@ export default function UserProvider({ children }) {
 
   const login = async userData => {
     const { username } = userData;
-    console.log('context', username);
     const res = await logIn(userData);
-
     if (res) {
       if (res === 201) {
         setNewUser(true);
       }
       setUser(username);
+      return true;
     }
+    return false;
   };
-
   const logout = async () => {
     const res = await logOut();
     if (res) {
       setUser(null);
     }
   };
-
   return (
     <UserContext.Provider value={{ user, newUser, login, logout }}>
       {children}

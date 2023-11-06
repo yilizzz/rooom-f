@@ -39,13 +39,11 @@ export default function PostTable({ data, isMark, refreshPage }) {
   };
   const onDeleteRoom = async id => {
     let deleted = false;
-
     if (isMark) {
       deleted = await deleteMark(user, id);
     } else {
       deleted = await deletePost(user, id);
     }
-
     if (deleted) {
       console.log('Deleted in table');
       refreshPage();

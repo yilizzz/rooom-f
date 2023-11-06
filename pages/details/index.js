@@ -59,7 +59,7 @@ export default function Details() {
   };
   const onLogin = () => {
     router.push({
-      pathname: '/account',
+      pathname: '/login',
     });
   };
   return (

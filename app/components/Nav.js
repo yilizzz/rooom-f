@@ -1,15 +1,24 @@
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React, { useState, useContext } from 'react';
+import { Button } from 'primereact/button';
 import { CascadeSelect } from 'primereact/cascadeselect';
 import Image from 'next/image';
 import { CityContext } from '@/utils/context/city';
+import { UserContext } from '@/utils/context/user';
 
 import cityData from '@/utils/service/citydata';
 
 const Nav = ({ selectFlag }) => {
   const { city, setCity } = useContext(CityContext);
-
+  const { user } = useContext(UserContext);
   const [selectedCity, setSelectedCity] = useState(null);
+  const router = useRouter();
+  const onLogin = () => {
+    router.push({
+      pathname: '/login',
+    });
+  };
 
   return (
     <>
@@ -30,6 +39,13 @@ const Nav = ({ selectFlag }) => {
             height="40"
           ></Image>
         </Link>
+        {user ? null : (
+          <Button
+            icon="pi pi-power-off"
+            className="p-button-success p-button-rounded bg-primary w-2rem h-2rem"
+            onClick={() => onLogin()}
+          />
+        )}
         <Link
           className="navItem text-orange-700"
           href="/map"
