@@ -42,7 +42,7 @@ const Nav = ({ selectFlag }) => {
         {user ? null : (
           <Button
             icon="pi pi-power-off"
-            className="p-button-success p-button-rounded bg-primary w-2rem h-2rem"
+            className="p-button-success p-button-rounded bg-blue-900 w-2rem h-2rem"
             onClick={() => onLogin()}
           />
         )}
@@ -53,13 +53,15 @@ const Nav = ({ selectFlag }) => {
         >
           MAP
         </Link>
-        <Link
-          className="navItem text-orange-700"
-          href="/account"
-          cursor-pointer="true"
-        >
-          ACCOUNT
-        </Link>
+        {user ? (
+          <Link
+            className="navItem text-orange-700"
+            href="/account"
+            cursor-pointer="true"
+          >
+            ACCOUNT
+          </Link>
+        ) : null}
 
         {selectFlag ? (
           <div>
