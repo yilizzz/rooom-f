@@ -11,21 +11,24 @@ export default function Circular({ rooms }) {
     {
       breakpoint: '1199px',
       numVisible: 2,
+      numScroll: 2,
+    },
+    {
+      breakpoint: '991px',
+      numVisible: 2,
       numScroll: 1,
     },
-    // {
-    //   breakpoint: '991px',
-    //   numVisible: 2,
-    //   numScroll: 1,
-    // },
     {
       breakpoint: '767px',
       numVisible: 1,
       numScroll: 1,
     },
   ];
+  // Show details page
   const onDetails = room => {
+    // Store the 'room' data in the browser's localStorage after converting it to a JSON string.
     localStorage.setItem('detailData', JSON.stringify(room));
+    // Navigate to the '/details' page.
     router.push({
       pathname: '/details',
       query: { mode: 'fromMapPage' },

@@ -1,45 +1,31 @@
 import { Toast } from 'primereact/toast';
 import { FileUpload } from 'primereact/fileupload';
-import { ProgressBar } from 'primereact/progressbar';
 import { Button } from 'primereact/button';
 import { Tooltip } from 'primereact/tooltip';
 import { Tag } from 'primereact/tag';
-import { useState, useContext, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 
-export default function ({ fileUploadRef }) {
+export default function ({ fileUploadRef, numImg }) {
   //--- Primereact Upload Component configuration start
-
   const toast = useRef(null);
-  const [totalSize, setTotalSize] = useState(0);
-  // const fileUploadRef = useRef(null);
+
+  const [fileNum, setFileNum] = useState(0);
 
   const onTemplateSelect = e => {
-    let _totalSize = totalSize;
-    let files = e.files;
-
-    Object.keys(files).forEach(key => {
-      _totalSize += files[key].size || 0;
-    });
-
-    setTotalSize(_totalSize);
+    setFileNum(e.files.length);
   };
 
   const onTemplateRemove = (file, callback) => {
-    setTotalSize(totalSize - file.size);
+    setFileNum(fileNum - 1);
     callback();
   };
 
   const onTemplateClear = () => {
-    setTotalSize(0);
+    setFileNum(0);
   };
 
   const headerTemplate = options => {
-    const { className, chooseButton, cancelButton } = options;
-    const value = totalSize / 10000;
-    const formatedValue =
-      fileUploadRef && fileUploadRef.current
-        ? fileUploadRef.current.formatSize(totalSize)
-        : '0 B';
+    const { className, chooseButton } = options;
 
     return (
       <div
@@ -51,15 +37,8 @@ export default function ({ fileUploadRef }) {
         }}
       >
         {chooseButton}
-
-        {cancelButton}
         <div className="flex align-items-center gap-3 ml-auto">
-          <span>{formatedValue} / 5 MB</span>
-          <ProgressBar
-            value={value}
-            showValue={false}
-            style={{ width: '10rem', height: '12px' }}
-          ></ProgressBar>
+          <span>{numImg + fileNum} / max 5 </span>
         </div>
       </div>
     );
@@ -123,20 +102,12 @@ export default function ({ fileUploadRef }) {
     className: 'custom-choose-btn p-button-rounded p-button-outlined',
   };
 
-  const cancelOptions = {
-    icon: 'pi pi-fw pi-times',
-    iconOnly: true,
-    className:
-      'custom-cancel-btn p-button-danger p-button-rounded p-button-outlined',
-  };
   //--- Primereact Upload Component configuration end
   return (
     <div className="border-round border-blue-900">
       <Toast ref={toast}></Toast>
 
       <Tooltip target=".custom-choose-btn" content="Choose" position="bottom" />
-
-      <Tooltip target=".custom-cancel-btn" content="Clear" position="bottom" />
 
       <FileUpload
         ref={fileUploadRef}
@@ -146,12 +117,11 @@ export default function ({ fileUploadRef }) {
         maxFileSize={5000000}
         onSelect={onTemplateSelect}
         onError={onTemplateClear}
-        onClear={onTemplateClear}
         headerTemplate={headerTemplate}
         itemTemplate={itemTemplate}
         emptyTemplate={emptyTemplate}
         chooseOptions={chooseOptions}
-        cancelOptions={cancelOptions}
+        disabled={numImg + fileNum > 4 ? true : false}
       />
     </div>
   );

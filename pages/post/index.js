@@ -116,10 +116,10 @@ export default function Post() {
       }
     }
   };
-  const onDeleteImg = (index, e) => {
+  const onDeleteImg = (url, e) => {
     e.preventDefault();
-    const updatedRoomImages = existingImages;
-    updatedRoomImages.splice(index, 1);
+    const updatedRoomImages = existingImages.filter(img => img != url);
+    setExistingImages(updatedRoomImages);
     setRoomData({ ...roomData, url: updatedRoomImages });
   };
   // Submit to add a new room
@@ -128,6 +128,10 @@ export default function Post() {
     const formData = new FormData();
     // Set all images files' data to formData
     const fileList = fileUploadRef.current.getFiles();
+    if (fileList.length + existingImages.length > 5) {
+      showToast('No more than 5 photos', 'error');
+      return;
+    }
     fileList.forEach(file => {
       formData.append('files', file);
     });
@@ -166,32 +170,41 @@ export default function Post() {
 
       <form className="postContainer" onSubmit={onSubmit}>
         <div className="flex align-self-center flex-column item1 ">
-          <UploadImg fileUploadRef={fileUploadRef} />
+          {existingImages.length > 4 ? (
+            <div className="text-l">
+              The number of pictures has reached the maximum 5
+            </div>
+          ) : (
+            <UploadImg
+              fileUploadRef={fileUploadRef}
+              numImg={existingImages.length}
+            />
+          )}
           <div className="flex flex-wrap mt-4 relative">
             {mode == 'edit' ? (
               existingImages.length > 0 ? (
-                existingImages.map((img, index) => {
+                existingImages.map(url => {
                   return (
                     <div
-                      key={index}
+                      key={url}
                       className="flex flex-nowrap items-center space-x-2 "
                     >
                       <Image
-                        src={img}
+                        src={url}
                         alt={title}
                         width="160"
-                        key={index}
+                        key={url}
                       ></Image>
                       <Button
                         icon="pi pi-times"
                         className="p-button-rounded"
-                        onClick={e => onDeleteImg(index, e)}
+                        onClick={e => onDeleteImg(url, e)}
                       ></Button>
                     </div>
                   );
                 })
               ) : (
-                <span className="text-3xl">No image yet</span>
+                <span className="text-l">No image yet</span>
               )
             ) : null}
           </div>

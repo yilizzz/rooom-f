@@ -38,7 +38,6 @@ function Account() {
     if (user) {
       const resMark = await getMarkedRooms(user);
       setMarkedRooms(resMark);
-      console.log('data fetched:', resMark);
       const resPost = await getPostRooms(user);
       setPostRooms(resPost);
     }

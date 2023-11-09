@@ -24,7 +24,6 @@ export default function PostTable({ data, isMark, refreshPage }) {
   };
   const onEditRoom = room => {
     localStorage.setItem('roomData', JSON.stringify(room));
-
     router.push({
       pathname: '/post',
       query: { mode: 'edit' },

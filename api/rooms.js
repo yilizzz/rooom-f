@@ -115,6 +115,7 @@ export const markRoom = async (user, id) => {
   console.log(response.data);
   return false;
 };
+// Add or Edit a room
 export const updateRoom = async (formData, type) => {
   if (type === 'edit') {
     const url = [process.env.NEXT_PUBLIC_API_URL, 'room', 'edit'].join('/');
