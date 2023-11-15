@@ -13,12 +13,12 @@ import { Toast } from 'primereact/toast';
 import { Image } from 'primereact/image';
 import { Button } from 'primereact/button';
 import UploadImg from '@/app/components/UploadImg';
+import { useLoading } from '@/utils/context/loading';
 
 export default function Post() {
   const router = useRouter();
-
+  const { loading, startLoading, stopLoading } = useLoading();
   const { user } = useContext(UserContext);
-
   const { city, getCityName } = useContext(CityContext);
   const [roomData, setRoomData] = useState({ user: user, city: city.code });
 
@@ -125,6 +125,7 @@ export default function Post() {
   // Submit to add a new room
   const onSubmit = async e => {
     e.preventDefault();
+    startLoading();
     const formData = new FormData();
     // Set all images files' data to formData
     const fileList = fileUploadRef.current.getFiles();
@@ -153,6 +154,7 @@ export default function Post() {
     if (res.status === 200) {
       showToast('Data updated', 'success');
       setTimeout(() => {
+        stopLoading();
         router.push({
           pathname: '/account',
           query: { mode: 'update' },
@@ -199,6 +201,7 @@ export default function Post() {
                         icon="pi pi-times"
                         className="p-button-rounded"
                         onClick={e => onDeleteImg(url, e)}
+                        disabled={loading}
                       ></Button>
                     </div>
                   );
@@ -349,7 +352,7 @@ export default function Post() {
             }}
           />
 
-          <Button className="w-6rem" type="submit">
+          <Button className="w-6rem" type="submit" disabled={loading}>
             Submit
           </Button>
         </div>

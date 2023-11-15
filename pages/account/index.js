@@ -4,9 +4,11 @@ import Nav from '@/app/components/Nav';
 import Footer from '@/app/components/Footer';
 import { Button } from 'primereact/button';
 import { Toast } from 'primereact/toast';
+import { ProgressSpinner } from 'primereact/progressspinner';
 import { useRouter } from 'next/router';
 import RoomTable from '@/app/components/RoomTable';
 import { getPostRooms, getMarkedRooms } from '@/api/rooms';
+import { useLoading } from '@/utils/context/loading';
 
 function Account() {
   const { user, logout } = useContext(UserContext);
@@ -14,9 +16,9 @@ function Account() {
   const [markedRooms, setMarkedRooms] = useState([]);
   // Receive the signals when component RoomTable delete a listing from the mark list or post list
   const [refreshPage, setRefreshPage] = useState(false);
+  const { loading, startLoading, stopLoading } = useLoading();
 
   const toastMessage = useRef(null);
-  const markRef = useRef(null);
   const router = useRouter();
   // The parameter passed from the post page to mark changes in the user's post data.
   const [mode, setMode] = useState(
@@ -36,17 +38,17 @@ function Account() {
       query: { mode: 'add' },
     });
   };
-  async function fetchData(user) {
-    if (user) {
-      const resMark = await getMarkedRooms(user);
-      console.log('fetchData', resMark);
-      setMarkedRooms(resMark);
-      const resPost = await getPostRooms(user);
-      setPostRooms(resPost);
-    }
-  }
 
   useEffect(() => {
+    async function fetchData(user) {
+      if (user) {
+        const resMark = await getMarkedRooms(user);
+        console.log('fetchData', resMark);
+        setMarkedRooms(resMark);
+        const resPost = await getPostRooms(user);
+        setPostRooms(resPost);
+      }
+    }
     // If user post or edit a listing, re-render
     if (mode) {
       setMode(null);
@@ -56,9 +58,11 @@ function Account() {
       setRefreshPage(false);
       // 异步请求后端数据的时候，往往会因为请求还未返回数据，
       // 方法后的一些动作已经开始执行了，若涉及到需要运用后端返回的数据的时候，
-      // 会发现拿到的是为空的数据，这个时候可以通过设置延迟或者回调函数进行操作。
+      // 会发现拿到的旧的数据，设置延迟。
+      startLoading();
       setTimeout(() => {
         fetchData(user);
+        stopLoading();
       }, 1000);
     } else {
       fetchData(user);
@@ -69,7 +73,7 @@ function Account() {
     <div className="flex flex-column justify-content-center align-items-center h-screen w-screen relative">
       <Nav selectFlag={false} />
       <Toast ref={toastMessage} position="center" />
-
+      {loading ? <ProgressSpinner id="spinner" /> : null}
       <div className="flex flex-column align-self-center justify-content-start my-8 py-4 ml-8 overflow-auto">
         <div className="my-4 flex justify-content-between">
           <h1 className="text-orange-700">Hello, {user}!</h1>
@@ -79,6 +83,7 @@ function Account() {
               label="Post A Room"
               icon="pi pi-file-edit"
               onClick={() => onPostRoom()}
+              disabled={loading}
             />
           </div>
           <div className="card flex justify-content-center mr-8">
@@ -86,6 +91,7 @@ function Account() {
               label="Logout"
               icon="pi pi-sign-out"
               onClick={() => handleLogout()}
+              disabled={loading}
             />
           </div>
         </div>
@@ -96,6 +102,7 @@ function Account() {
             data={markedRooms}
             isMark={true}
             refreshPage={() => setRefreshPage(true)}
+            buttonsDisabled={loading}
           />
         </div>
 
@@ -105,6 +112,7 @@ function Account() {
             data={postRooms}
             isMark={false}
             refreshPage={() => setRefreshPage(true)}
+            buttonsDisabled={loading}
           />
         </div>
       </div>

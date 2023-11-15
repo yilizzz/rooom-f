@@ -19,6 +19,13 @@ body {
   font-family: var(--font-family);
   display: flex;
   flex-direction: column;
+  filter: grayscale(0%); /* 页面不变灰 */
+}
+
+#spinner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
 }
 img {
   object-fit: cover;

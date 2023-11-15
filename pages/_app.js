@@ -10,6 +10,7 @@ import '@/styles/globals.css';
 
 import CityProvider from '@/utils/context/city';
 import UserProvider from '@/utils/context/user';
+import LoadingProvider from '@/utils/context/loading';
 import Head from 'next/head';
 
 export default function App({ Component, pageProps }) {
@@ -17,11 +18,13 @@ export default function App({ Component, pageProps }) {
     <PrimeReactProvider>
       <UserProvider>
         <CityProvider>
-          <Head>
-            <link rel="icon" href="/favicon.png" />
-            <title>My Rooom</title>
-          </Head>
-          <Component {...pageProps} />
+          <LoadingProvider>
+            <Head>
+              <link rel="icon" href="/favicon.png" />
+              <title>My Rooom</title>
+            </Head>
+            <Component {...pageProps} />
+          </LoadingProvider>
         </CityProvider>
       </UserProvider>
     </PrimeReactProvider>

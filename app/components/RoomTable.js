@@ -7,7 +7,12 @@ import { UserContext } from '@/utils/context/user';
 import { CityContext } from '@/utils/context/city';
 import { deleteMark, deletePost } from '@/api/rooms';
 
-export default function PostTable({ data, isMark, refreshPage }) {
+export default function PostTable({
+  data,
+  isMark,
+  refreshPage,
+  buttonsDisabled,
+}) {
   const toastMessage = useRef(null);
   const { user } = useContext(UserContext);
   const { getCityName } = useContext(CityContext);
@@ -93,18 +98,21 @@ export default function PostTable({ data, isMark, refreshPage }) {
                   icon="pi pi-search-plus"
                   className="p-button-rounded"
                   onClick={() => onDetailRoom(room)}
+                  disabled={buttonsDisabled}
                 ></Button>
               ) : (
                 <Button
                   icon="pi pi-wrench"
                   className="p-button-rounded"
                   onClick={() => onEditRoom(room)}
+                  disabled={buttonsDisabled}
                 ></Button>
               )}
               <Button
                 icon="pi pi-times"
                 className="p-button-rounded"
                 onClick={() => onDeleteRoom(room.id)}
+                disabled={buttonsDisabled}
               ></Button>
             </div>
           </div>
