@@ -50,23 +50,35 @@ function Account() {
       }
     }
     // If user post or edit a listing, re-render
+    // if (mode) {
+    //   setMode(null);
+    //   fetchData(user);
+    //   // If user delete a listing, re-render
+    // } else if (refreshPage) {
+    //   setRefreshPage(false);
+    //   startLoading();
+    //   setTimeout(() => {
+    //     fetchData(user);
+    //     stopLoading();
+    //   }, 1000);
+    // } else {
+    //   startLoading();
+    //   setTimeout(() => {
+    //     fetchData(user);
+    //     stopLoading();
+    //   }, 1000);
+    // }
     if (mode) {
       setMode(null);
-      fetchData(user);
-      // If user delete a listing, re-render
-    } else {
-      if (refreshPage) {
-        setRefreshPage(false);
-      }
-      startLoading();
-      // 异步请求后端数据的时候，往往会因为请求还未返回数据，
-      // 方法后的一些动作已经开始执行了，若涉及到需要运用后端返回的数据的时候，
-      // 会发现拿到的旧的数据，设置延迟。
-      setTimeout(() => {
-        fetchData(user);
-        stopLoading();
-      }, 1000);
     }
+    if (refreshPage) {
+      setRefreshPage(false);
+    }
+    startLoading();
+    setTimeout(() => {
+      fetchData(user);
+      stopLoading();
+    }, 1000);
   }, [user, mode, refreshPage]);
 
   return (
