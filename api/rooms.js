@@ -37,30 +37,36 @@ export const getCityRooms = async cityCode => {
   // This city has no room data or network errors
   return [];
 };
+
 // Get posted rooms of certain user
 export const getPostRooms = async user => {
   const listName = 'post-list';
   const url = `${API_URL}/room/list?user=${user}&listName=${listName}`;
-
   const response = await axios.get(url);
-
-  if (response.status === 200) {
-    return response.data;
+  if (response.status == 404) {
+    console.log('Data file error');
+    return [];
   }
-  // This user has not posted room or network errors
-  return [];
+  if (response.status == 500) {
+    console.log('Server error');
+    return [];
+  }
+  return response.data;
 };
 // Get marked rooms of certain user
 export const getMarkedRooms = async user => {
   const listName = 'mark-list';
   const url = `${API_URL}/room/list?user=${user}&listName=${listName}`;
-
   const response = await axios.get(url);
-
-  if (response.status === 200) {
-    return response.data;
+  if (response.status == 404) {
+    console.log('Data file error');
+    return [];
   }
-  return [];
+  if (response.status == 500) {
+    console.log('Server error');
+    return [];
+  }
+  return response.data;
 };
 // Private function: Delete a record from mark-list or post-list
 const deleteRoom = async (user, id, type) => {

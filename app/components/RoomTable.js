@@ -40,11 +40,11 @@ export default function PostTable({ data, isMark, refreshPage }) {
     let deleted = false;
     if (isMark) {
       deleted = await deleteMark(user, id);
+      console.log('delete');
     } else {
       deleted = await deletePost(user, id);
     }
     if (deleted) {
-      console.log('Deleted in table');
       refreshPage();
     } else {
       showToast(
@@ -56,7 +56,10 @@ export default function PostTable({ data, isMark, refreshPage }) {
   const itemTemplate = room => {
     return (
       <div className="col-12">
-        <div className="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4">
+        <div
+          className="flex flex-column xl:flex-row xl:align-items-start p-4 gap-4"
+          key={room.id}
+        >
           <Toast ref={toastMessage} position="center" />
           {room.url.length > 0 ? (
             <img

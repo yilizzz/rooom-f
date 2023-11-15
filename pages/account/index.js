@@ -12,11 +12,13 @@ function Account() {
   const { user, logout } = useContext(UserContext);
   const [postRooms, setPostRooms] = useState([]);
   const [markedRooms, setMarkedRooms] = useState([]);
-  // Receive the signals when component RoomTable delete a listing in the mark list or post list
+  // Receive the signals when component RoomTable delete a listing from the mark list or post list
   const [refreshPage, setRefreshPage] = useState(false);
 
   const toastMessage = useRef(null);
+  const markRef = useRef(null);
   const router = useRouter();
+  // The parameter passed from the post page to mark changes in the user's post data.
   const [mode, setMode] = useState(
     router.query.mode ? router.query.mode : null,
   );
@@ -37,24 +39,31 @@ function Account() {
   async function fetchData(user) {
     if (user) {
       const resMark = await getMarkedRooms(user);
+      console.log('fetchData', resMark);
       setMarkedRooms(resMark);
       const resPost = await getPostRooms(user);
       setPostRooms(resPost);
     }
   }
-  useEffect(() => {
-    fetchData(user);
-    setMode(null);
-  }, [mode]);
-  useEffect(() => {
-    fetchData(user);
-  }, [user]);
 
   useEffect(() => {
-    fetchData(user);
-    console.log('change');
-    setRefreshPage(false);
-  }, [refreshPage]);
+    // If user post or edit a listing, re-render
+    if (mode) {
+      setMode(null);
+      fetchData(user);
+      // If user delete a listing, re-render
+    } else if (refreshPage) {
+      setRefreshPage(false);
+      // 异步请求后端数据的时候，往往会因为请求还未返回数据，
+      // 方法后的一些动作已经开始执行了，若涉及到需要运用后端返回的数据的时候，
+      // 会发现拿到的是为空的数据，这个时候可以通过设置延迟或者回调函数进行操作。
+      setTimeout(() => {
+        fetchData(user);
+      }, 1000);
+    } else {
+      fetchData(user);
+    }
+  }, [user, mode, refreshPage]);
 
   return (
     <div className="flex flex-column justify-content-center align-items-center h-screen w-screen relative">
