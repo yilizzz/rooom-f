@@ -50,35 +50,20 @@ function Account() {
       }
     }
     // If user post or edit a listing, re-render
-    // if (mode) {
-    //   setMode(null);
-    //   fetchData(user);
-    //   // If user delete a listing, re-render
-    // } else if (refreshPage) {
-    //   setRefreshPage(false);
-    //   startLoading();
-    //   setTimeout(() => {
-    //     fetchData(user);
-    //     stopLoading();
-    //   }, 1000);
-    // } else {
-    //   startLoading();
-    //   setTimeout(() => {
-    //     fetchData(user);
-    //     stopLoading();
-    //   }, 1000);
-    // }
     if (mode) {
       setMode(null);
-    }
-    if (refreshPage) {
-      setRefreshPage(false);
-    }
-    startLoading();
-    setTimeout(() => {
       fetchData(user);
-      stopLoading();
-    }, 1000);
+      // If user delete a listing, re-render
+    } else if (refreshPage) {
+      setRefreshPage(false);
+      startLoading();
+      setTimeout(() => {
+        fetchData(user);
+        stopLoading();
+      }, 1000);
+    } else {
+      fetchData(user);
+    }
   }, [user, mode, refreshPage]);
 
   return (
