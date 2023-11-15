@@ -52,16 +52,19 @@ function Account() {
     // If user post or edit a listing, re-render
     if (mode) {
       setMode(null);
+      fetchData(user);
     }
     // If user delete a listing, re-render
-    if (refreshPage) {
+    else if (refreshPage) {
       setRefreshPage(false);
-    }
-    startLoading();
-    setTimeout(() => {
+      startLoading();
+      setTimeout(() => {
+        fetchData(user);
+        stopLoading();
+      }, 2000);
+    } else {
       fetchData(user);
-      stopLoading();
-    }, 2000);
+    }
   }, [user, mode, refreshPage]);
 
   return (
