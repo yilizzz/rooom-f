@@ -1,8 +1,3 @@
-:root {
-  /* --primary-color: #345c9d; */
-  /* --cat-color: #fb8b05; */
-}
-
 * {
   box-sizing: border-box;
   padding: 0;
@@ -19,7 +14,6 @@ body {
   font-family: var(--font-family);
   display: flex;
   flex-direction: column;
-  filter: grayscale(0%); /* 页面不变灰 */
 }
 
 #spinner {
