@@ -61,9 +61,13 @@ function Account() {
       setTimeout(() => {
         fetchData(user);
         stopLoading();
-      }, 2000);
+      }, 1000);
     } else {
-      fetchData(user);
+      startLoading();
+      setTimeout(() => {
+        fetchData(user);
+        stopLoading();
+      }, 1000);
     }
   }, [user, mode, refreshPage]);
 
