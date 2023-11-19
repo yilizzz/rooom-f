@@ -1,10 +1,10 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## My Rooom
-# Overview
+# My Rooom
+## Overview
 This is a location-based website demo that allows users to access rental information using Google Maps. Users can also publish and mark rental listings on the platform.
 [demo](https://rooom-f.vercel.app/)
-# Features
+## Features
 1. Google Maps Integration
 Users can easily view rental information on Google Maps.
 The integration provides a user-friendly interface for exploring rental locations.
