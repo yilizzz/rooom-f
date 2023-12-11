@@ -151,7 +151,7 @@ export default function Post() {
     if (mode === 'add') {
       res = await updateRoom(formData, 'add');
     }
-    if (res.status === 200) {
+    if (res?.status === 200) {
       showToast('Data updated', 'success');
       setTimeout(() => {
         stopLoading();

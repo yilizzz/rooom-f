@@ -1,5 +1,3 @@
-import 'primereact/resources/themes/lara-light-indigo/theme.css';
-
 import { PrimeReactProvider } from 'primereact/api';
 import '@/primereact-theme/theme.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
