@@ -1,10 +1,10 @@
 import { PrimeReactProvider } from 'primereact/api';
-import '@/primereact-theme/theme.css';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primeflex/primeflex.css';
 import 'primeicons/primeicons.css';
 import 'primereact/resources/primereact.css';
 import '@/styles/globals.css';
+import '@/primereact-theme/theme.css';
 
 import CityProvider from '@/utils/context/city';
 import UserProvider from '@/utils/context/user';
